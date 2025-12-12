@@ -24,8 +24,7 @@ module.exports = async (req, res) => {
   try {
     // ============= ROUTES =============
     if (path.startsWith('search')) {
-      return require('./mcp-server')(req, res);
-    }
+    return require('./mcp-search')(req, res);    }
     
     if (path.startsWith('resources')) {
       return require('./mcp-resources')(req, res);
