@@ -117,4 +117,32 @@ if (process.env.VERCEL_ENV) {
   module.exports.health = async (req, res) => {
     res.status(200).json({ status: 'healthy', uptime: process.uptime() });
   };
+
+      // ============= DASHBOARD ROUTES ==============
+  // Dashboard UI for testing and monitoring
+  if (path.startsWith('/dashboard')) {
+    const { dashboardHandler, dashboardStatsHandler } = await import('./dashboard.js');
+    if (req.path === '/dashboard') return dashboardHandler(req, res);
+    if (req.path === '/api/stats') return dashboardStatsHandler(req, res);
+  }
+  
+  // Root path defaults to dashboard
+  if (path === '' || path === '/') {
+    const { dashboardHandler } = await import('./dashboard.js');
+    return dashboardHandler(req, res);
+  }
+  
+  // ============= SEARCH TEST ROUTES ==============
+  // Test external MCP servers
+  if (path.startsWith('/search-test')) {
+    const { testExternalMCP, healthCheck } = await import('./search-test.js');
+    if (req.method === 'POST' && path === '') return testExternalMCP(req, res);
+    if (path === '/health') return healthCheck(req, res);
+  }
+  
+  // ============= HEALTH CHECK ROUTES ==============
+  if (path === '/health' || path === '/api/health') {
+    const { healthCheckHandler } = await import('./monitor.js');
+    return healthCheckHandler(req, res);
+  }
 }
